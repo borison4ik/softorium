@@ -1,95 +1,57 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+'use client';
+
+import styles from './page.module.css';
+import { useEffect, useState } from 'react';
+
+const limit = 3;
+const userCount = 10;
 
 export default function Home() {
+  const [users, setUsers] = useState([]);
+  const [start, setStart] = useState<number>(0);
+
+  const prevClickHandler = () => {
+    setStart(start - limit);
+  };
+
+  const nextClickHandler = () => {
+    setStart(start + limit);
+  };
+
+  useEffect(() => {
+    const apiUrl = `https://jsonplaceholder.typicode.com/users?_limit=${limit}&_start=${start}`;
+
+    const getUsers = async () => {
+      try {
+        const response = await fetch(apiUrl);
+        const users = await response.json();
+        setUsers(users);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    getUsers();
+  }, [start]);
+
+  if (!users.length) return <div className={styles.page}>список пуст</div>;
+
   return (
     <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol>
-          <li>
-            Get started by editing <code>app/page.tsx</code>.
+      <ul className={styles.list}>
+        {users.map((user) => (
+          <li key={user.id}>
+            {user.id} - {user.name}
           </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
-
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.secondary}
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className={styles.footer}>
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+        ))}
+      </ul>
+      <div className={styles.buttons}>
+        <button onClick={prevClickHandler} disabled={start <= 0}>
+          prev
+        </button>
+        <button onClick={nextClickHandler} disabled={start + limit >= userCount}>
+          next
+        </button>
+      </div>
     </div>
   );
 }
