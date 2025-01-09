@@ -6,8 +6,13 @@ import { useEffect, useState } from 'react';
 const limit = 3;
 const userCount = 10;
 
+type User = {
+  id: number;
+  name: string;
+};
+
 export default function Home() {
-  const [users, setUsers] = useState([]);
+  const [users, setUsers] = useState<User[]>([]);
   const [start, setStart] = useState<number>(0);
 
   const prevClickHandler = () => {
@@ -23,8 +28,8 @@ export default function Home() {
 
     const getUsers = async () => {
       try {
-        const response = await fetch(apiUrl);
-        const users = await response.json();
+        const response: Response = await fetch(apiUrl);
+        const users: User[] = await response.json();
         setUsers(users);
       } catch (error) {
         console.log(error);
