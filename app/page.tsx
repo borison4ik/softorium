@@ -14,27 +14,27 @@ type User = {
 export default function Home() {
   const [users, setUsers] = useState<User[]>([]);
   const [start, setStart] = useState<number>(0);
+  const apiUrl = `https://jsonplaceholder.typicode.com/users?_limit=${limit}&_start=${start}`;
+
+  const getUsers = async () => {
+    try {
+      const response: Response = await fetch(apiUrl);
+      const users: User[] = await response.json();
+      setUsers(users);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const prevClickHandler = () => {
-    setStart(start - limit);
+    setStart((start) => start - limit);
   };
 
   const nextClickHandler = () => {
-    setStart(start + limit);
+    setStart((start) => start + limit);
   };
 
   useEffect(() => {
-    const apiUrl = `https://jsonplaceholder.typicode.com/users?_limit=${limit}&_start=${start}`;
-
-    const getUsers = async () => {
-      try {
-        const response: Response = await fetch(apiUrl);
-        const users: User[] = await response.json();
-        setUsers(users);
-      } catch (error) {
-        console.log(error);
-      }
-    };
     getUsers();
   }, [start]);
 
